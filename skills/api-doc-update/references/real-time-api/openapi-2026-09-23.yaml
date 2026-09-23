@@ -1,0 +1,246 @@
+openapi: 3.0.0
+info:
+  title: Real-Time API — Version Settings
+  version: 1.0.0
+  description: >
+    HTTP API for managing per-user measurement queue version preferences.
+    Use this API to schedule a switch from the v1 measurement stream (Kinesis)
+    to the v2 stream (Kafka), or to cancel an upcoming switch.
+servers:
+  - url: https://tds-real-time-api.{testo_env}.savr.saveris.net
+    variables:
+      region:
+        default: eu
+        description: AWS region prefix
+      stage:
+        default: i
+        description: Environment stage (d = dev, i = integration, p = production)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/version-settings:
+    post:
+      summary: Schedule a version switch
+      description: >
+        Schedules a schema version switch for a queue from a given point in time (ISO 8601 UTC).
+        A sentinel row with version 1 and activeFrom 1970-01-01T00:00:00Z is automatically
+        created on first save as the default fallback.
+        Downgrading to a lower version number is not allowed.
+      operationId: saveVersionSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionSettingsRequest'
+            examples:
+              measurements_v2:
+                summary: Switch measurements queue to v2
+                value:
+                  queue: measurements
+                  version: 2
+                  activeFrom: "2026-07-01T00:00:00Z"
+      responses:
+        '200':
+          description: Version switch scheduled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionSettingsConfirmation'
+              example:
+                queue: measurements
+                version: 2
+                activeFrom: "2026-07-01T00:00:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: Version downgrade rejected
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                title: "Version downgrade not allowed"
+                status: 422
+                detail: "Version downgrade not allowed: current active is 2, requested is 1"
+                instance: "81ade393-06a4-4350-a477-ba0a3647d6f1"
+                queue: measurements
+
+    get:
+      summary: List version settings
+      description: >
+        Returns all stored version settings entries for the authenticated user and the given queue,
+        including the default sentinel row with activeFrom 1970-01-01T00:00:00Z.
+      operationId: listVersionSettings
+      parameters:
+        - $ref: '#/components/parameters/queue'
+      responses:
+        '200':
+          description: List of version settings entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionSettingsRequest'
+              example:
+                - queue: measurements
+                  version: 1
+                  activeFrom: "1970-01-01T00:00:00Z"
+                - queue: measurements
+                  version: 2
+                  activeFrom: "2026-07-01T00:00:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/version-settings/upcoming:
+    delete:
+      summary: Delete upcoming version entries
+      description: >
+        Deletes future entries (activeFrom > now) for the authenticated user and queue.
+        The sentinel row (activeFrom = 1970-01-01T00:00:00Z) and fully completed history
+        entries are always kept.
+
+
+        By default, entries currently mid-transition (activeFrom <= now but activeFrom + 4h > now)
+        are also kept. Pass deleteTransition=true to also cancel an in-progress transition.
+      operationId: deleteUpcomingVersionSettings
+      parameters:
+        - $ref: '#/components/parameters/queue'
+        - name: deleteTransition
+          in: query
+          required: false
+          description: >
+            When true, also deletes entries currently in the 4-hour transition window
+            (activeFrom <= now < activeFrom + 4h). Defaults to false.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '204':
+          description: Upcoming entries deleted successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cognito JWT token. Obtain via the Cognito InitiateAuth endpoint.
+
+  parameters:
+    queue:
+      name: queue
+      in: query
+      required: true
+      description: The measurement queue to operate on.
+      schema:
+        type: string
+        enum:
+          - measurements
+          - alarms
+
+  responses:
+    BadRequest:
+      description: Invalid queue or version value
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            status: 400
+            detail: "queue must be one of: [measurements, alarms]"
+            instance: "81ade393-06a4-4350-a477-ba0a3647d6f1"
+    Unauthorized:
+      description: Missing or invalid Bearer token
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+          example:
+            title: "Unauthorized"
+            status: 401
+            detail: "Full authentication is required to access this resource."
+            instance: "8cf3369c-3b42-4e9c-b03d-3f87e8a2531d"
+
+  schemas:
+    ProblemDetail:
+      type: object
+      description: >
+        RFC 9457 (https://www.rfc-editor.org/info/rfc9457/) Problem Details response, per ADR 86.
+        All error responses from this API use this shape with content type application/problem+json.
+        type and title are only included when meaningfully set; detail is only ever present on 4xx
+        responses, never on 5xx. Extension members (e.g. "queue" on the 422 response above) are
+        flattened as additional top-level properties rather than nested.
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI identifying the problem type. Omitted unless explicitly set.
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type. Omitted unless explicitly set.
+        status:
+          type: integer
+          description: The HTTP status code, repeated in the body for convenience.
+          example: 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence. 4xx only.
+        instance:
+          type: string
+          description: >
+            The request's Datadog trace id (dd.trace_id), for correlating this error response
+            with server-side logs.
+          example: "81ade393-06a4-4350-a477-ba0a3647d6f1"
+      additionalProperties: true
+
+    VersionSettingsRequest:
+      type: object
+      required:
+        - queue
+        - version
+        - activeFrom
+      properties:
+        queue:
+          type: string
+          enum:
+            - measurements
+            - alarms
+          description: The queue this setting applies to.
+          example: measurements
+        version:
+          type: integer
+          description: Target version. Only upgrading to version 2 is supported.
+          enum:
+            - 2
+          example: 2
+        activeFrom:
+          type: string
+          format: date-time
+          description: UTC timestamp (ISO 8601) from which this version becomes active.
+          example: "2026-07-01T00:00:00Z"
+
+    VersionSettingsConfirmation:
+      type: object
+      properties:
+        queue:
+          type: string
+          example: measurements
+        version:
+          type: integer
+          example: 2
+        activeFrom:
+          type: string
+          format: date-time
+          example: "2026-07-01T00:00:00Z"

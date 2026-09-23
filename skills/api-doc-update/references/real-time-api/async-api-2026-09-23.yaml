@@ -1,0 +1,537 @@
+asyncapi: 3.1.0
+info:
+  title: Real-Time API
+  version: 1.3.0
+  description: >
+    This real-time api provides an endpoint for users to subscribe to the alarm
+    and measurements messages. The messages were buffered in a queue when users
+    disconnected from the server and will be retrived once reconnected.
+
+
+    ## Errors
+
+    Any error condition (failed authentication, rate limiting, subscription refused,
+    or an unexpected server-side error) is reported to the client as a STOMP ERROR
+    frame - see `components.schemas.StompErrorFrame` below. After sending an ERROR
+    frame the server closes the WebSocket connection, per the STOMP protocol.
+
+
+    Known ERROR frame scenarios on this server:
+
+    - **Missing/invalid Authorization header on CONNECT** - message: `invalid authorization`.
+    - **Rate limited - too many parallel connections** - message: `Maximum parallel
+      connection limit exceeded. Please close other connections.`, header
+      `error-code: max-connections-reached`.
+    - **Rate limited - too many connection attempts** - message: `Too many connection
+      attempts. Please wait {ms} ms before retrying.`, header `error-code: rate-limit-exceeded`.
+    - **Subscription refused** (missing permission/license for the queue) - message:
+      `subscription refused: missing required permission or license for queue: {queue}`,
+      header `queue: {queue}`.
+    - **Unexpected server-side error** while processing any other client frame - message:
+      `Unable to process the request.` The real cause is logged server-side only and never
+      included in the frame sent to the client.
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+servers:
+  real-time:
+    host: tds-real-time-api.{testo_env}.savr.saveris.net
+    pathname: /web-socket
+    protocol: wss
+    security:
+      - $ref: '#/components/securitySchemes/bearerAuth'
+channels:
+  /queue/username/alarms:
+    address: /queue/username/alarms
+    messages:
+      subscribe.message.0:
+        $ref: '#/components/messages/measurement_alarm'
+      subscribe.message.1:
+        $ref: '#/components/messages/system_alarm'
+    description: >-
+      Subscribe to this channel to receive the alarm message. NOTE that the
+      username must match the username you used while acquring the token!
+    x-codeSamples:
+      javascript-client:
+        summary: A test client that subscribes to the alarm channel
+        lang: javascript
+        code: |
+          import {RxStomp, StompHeaders} from "@stomp/rx-stomp";
+        '': |
+          import { WebSocket } from 'ws';
+        ' ': |
+          Object.assign(global, { WebSocket});
+        '  ': |
+          const token = "";
+        '   ': |
+          const rxStomp = new RxStomp();
+        '    ': >
+          rxStomp.configure({brokerURL:
+          'wss://tds-real-time-api.{testo_env}.savr.saveris.net/web-socket',debug:
+          console.log.bind(console),connectHeaders: {Authorization: `Bearer
+          ${token}`}})
+        '     ': |
+          rxStomp.activate();
+        '      ': |
+          let subHeaders = new StompHeaders()
+        '       ': >
+          const subscription = rxStomp.watch({ destination:
+          "/queue/username/alarms", subHeaders }).subscribe((message) =>
+          {console.log(message.body)});
+      java-spring-boot-client:
+        link-to-example-code: >-
+          https://api-docs.{testo_env}.savr.saveris.net/real-time-api/spring-boot-websocket-client.zip
+  /queue/username/measurements:
+    address: /queue/username/measurements
+    messages:
+      subscribe.message.0:
+        $ref: '#/components/messages/measurements'
+    description: >-
+      **Note: This channel will be deprecated in the near future. Please use */queue/username/measurements-v2* instead.**
+
+      <p>Subscribe to this channel to receive the measurements message. NOTE that
+      the username must match the username you used while acquring the token!</p>
+    x-codeSamples:
+      javascript-client:
+        summary: A test client that subscribes to the measurements channel
+        lang: javascript
+        code: |
+          import {RxStomp, StompHeaders} from "@stomp/rx-stomp";
+        '': |
+          import { WebSocket } from 'ws';
+        ' ': |
+          Object.assign(global, { WebSocket});
+        '  ': |
+          const token = "";
+        '   ': |
+          const rxStomp = new RxStomp();
+        '    ': >
+          rxStomp.configure({brokerURL:
+          'wss://tds-real-time-api.{testo_env}.savr.saveris.net/web-socket',debug:
+          console.log.bind(console),connectHeaders: {Authorization: `Bearer
+          ${token}`}})
+        '     ': |
+          rxStomp.activate();
+        '      ': |
+          let subHeaders = new StompHeaders()
+        '       ': >
+          const subscription = rxStomp.watch({ destination:
+          "/queue/username/measurements", subHeaders }).subscribe((message) =>
+          {console.log(message.body)});
+      java-spring-boot-client:
+        link-to-example-code: >-
+          https://api-docs.{testo_env}.savr.saveris.net/real-time-api/spring-boot-websocket-client.zip
+  /queue/username/measurements-v2:
+    address: /queue/username/measurements-v2
+    messages:
+      subscribe.message.0:
+        $ref: '#/components/messages/measurements_v2'
+    description: >-
+      Subscribe to this channel to receive measurements in the v2 format (MeasurementOutputMessage).
+      Only active after a version switch has been scheduled via the version-settings API.
+      NOTE that the username must match the username you used while acquiring the token!
+    x-codeSamples:
+      javascript-client:
+        summary: A test client that subscribes to the measurements-v2 channel
+        lang: javascript
+        code: |
+          import {RxStomp, StompHeaders} from "@stomp/rx-stomp";
+        '': |
+          import { WebSocket } from 'ws';
+        ' ': |
+          Object.assign(global, { WebSocket});
+        '  ': |
+          const token = "";
+        '   ': |
+          const rxStomp = new RxStomp();
+        '    ': >
+          rxStomp.configure({brokerURL:
+          'wss://tds-real-time-api.{testo_env}.savr.saveris.net/web-socket',debug:
+          console.log.bind(console),connectHeaders: {Authorization: `Bearer
+          ${token}`}})
+        '     ': |
+          rxStomp.activate();
+        '      ': |
+          let subHeaders = new StompHeaders()
+        '       ': >
+          const subscription = rxStomp.watch({ destination:
+          "/queue/username/measurements-v2", subHeaders }).subscribe((message) =>
+          {console.log(message.body)});
+      java-spring-boot-client:
+        link-to-example-code: >-
+          https://api-docs.{testo_env}.savr.saveris.net/real-time-api/spring-boot-websocket-client.zip
+operations:
+  /queue/username/alarms.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/~1queue~1username~1alarms'
+    messages:
+      - $ref: '#/channels/~1queue~1username~1alarms/messages/subscribe.message.0'
+      - $ref: '#/channels/~1queue~1username~1alarms/messages/subscribe.message.1'
+  /queue/username/measurements.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/~1queue~1username~1measurements'
+    messages:
+      - $ref: >-
+          #/channels/~1queue~1username~1measurements/messages/subscribe.message.0
+  /queue/username/measurements-v2.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/~1queue~1username~1measurements-v2'
+    messages:
+      - $ref: >-
+          #/channels/~1queue~1username~1measurements-v2/messages/subscribe.message.0
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  messages:
+    measurement_alarm:
+      summary: measurement alarm event
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/message_metadata'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/shared_alarm_schema'
+          - $ref: '#/components/schemas/additional_schema_for_measurement_alarm'
+    system_alarm:
+      summary: device/sensor system alarm event
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/message_metadata'
+      payload:
+        $ref: '#/components/schemas/shared_alarm_schema'
+    measurements:
+      summary: measurements
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/message_metadata'
+      payload:
+        $ref: '#/components/schemas/measurements_schema'
+    measurements_v2:
+      summary: measurements v2
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/message_metadata'
+      payload:
+        $ref: '#/components/schemas/measurements_v2_schema'
+  schemas:
+    StompErrorFrame:
+      type: object
+      description: >
+        Shape of every STOMP ERROR frame sent by this server. See the "Errors" section
+        above for the concrete scenarios and their message/header values. The connection
+        is closed immediately after this frame is sent.
+      properties:
+        command:
+          type: string
+          enum: [ERROR]
+        headers:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Human-readable, client-safe description of the error.
+              example: "Maximum parallel connection limit exceeded. Please close other connections."
+            error-code:
+              type: string
+              description: Present only for rate-limiting errors.
+              enum: [max-connections-reached, rate-limit-exceeded]
+            queue:
+              type: string
+              description: Present only for subscription-refused errors.
+              example: measurements
+        body:
+          type: string
+          description: Same text as the "message" header.
+
+    connection_metadata:
+      type: object
+      properties:
+        user-name:
+          type: string
+          example: username
+        version:
+          type: string
+          example: '1.2'
+        session:
+          type: string
+          example: >-
+            ID:b-4d60f416-7083-406c-9476-6d166c21bf72-1-39009-1682707981501-3:10933
+        heart-beat:
+          type: string
+          example: '10000,10000'
+        server:
+          type: string
+          example: ActiveMQ/5.17.2
+        content-length:
+          $ref: '#/components/schemas/content_length'
+        id:
+          type: string
+          example: sub-0
+        destination:
+          $ref: '#/components/schemas/destination'
+    message_metadata:
+      type: object
+      properties:
+        content-length:
+          $ref: '#/components/schemas/content_length'
+        timestamp:
+          type: string
+          example: '1682749648090'
+        content-type:
+          type: string
+          example: application/json
+        message-id:
+          type: string
+          example: cb-4d60f416-7083-406c-9476-6d166c21bf72-1-39009-1682707981501-3
+        priority:
+          type: string
+          example: '4'
+        subscription:
+          type: string
+          example: sub-0
+        destination:
+          $ref: '#/components/schemas/destination'
+        expires:
+          type: string
+          example: '0'
+    shared_alarm_schema:
+      type: object
+      description: Detailed information about the alarm.
+      properties:
+        uuid:
+          type: string
+          description: Unique identifier of the alarm
+          example: b107fe58-6e2d-4f18-bae6-767e2a30c9c7
+        tenant_uuid:
+          type: string
+          description: Tenant to which the alarm belongs to
+          example: f9a86182-3b41-4964-1111-149f083b11d6
+        alarm_reason:
+          type: string
+          description: >-
+            Reason of the alarm, could be one of the following; 'Unknown',
+            'Alarm condition is violated', 'Alarm condition is adhered', 'The
+            alarm condition does no longer exist', 'The time period for alarm
+            supervision has ended'
+          example: Alarm condition is violated
+        alarm_status:
+          type: string
+          description: >-
+            Status of the alarm, could be one of the following; 'Unknown',
+            'Alarm', 'Ok'
+          example: Alarm
+        last_status_change_time:
+          type: string
+          description: 'Time when the alarm was changed last, UTC in iso8601 format'
+          example: '2023-04-29T01:35:37Z'
+        alarm_condition_type:
+          type: string
+          description: >-
+            Condition type of the alarm, could be one of the following;
+            'Unknown', 'The battery of the device is nearly empty', 'Lost
+            external power supply for device', 'Connection timeout, device did
+            not communicated in expected time', 'Sensor is broken', 'Calibration
+            is too old', 'Upper limit', 'Lower limit'
+          example: Upper limit
+        alarm_severity:
+          type: string
+          description: >-
+            Severity of the alarm, could be one of the following; 'Unknown',
+            'Alarm', 'Warning'
+          example: Warning
+        alarm_time:
+          type: string
+          description: 'Time when the alarm occurred, UTC in iso8601 format'
+          example: '2023-04-29T06:25:00Z'
+        alarm_time_local:
+          type: string
+          description: >-
+            Time when the alarm occurred, iso8601 format in the local time of
+            the tenant
+          example: '2023-04-29T08:25:00+02:00'
+        serial_number:
+          type: string
+          description: Serial number
+          example: '56000000'
+        alarm_source_uuid:
+          type: string
+          description: >-
+            Unique identifier of the source that caused the alarm. It depends on
+            the alarm_type; for device system alarm type, alarm_source_uuid is
+            the device_uuid; for sensor system alarm type, alarm_source_uuid is
+            the sensor_uuid; for measurement alarm type, alarm_source_uuid is
+            the sensor_uuid or empty.
+          example: f1aa6496-abe8-4920-1111-7ee5f529a321
+        alarm_type:
+          type: string
+          description: >-
+            Type of the alarm, could be one of the following; 'measurement
+            alarm', 'device system alarm', 'sensor system alarm'
+          example: measurement alarm
+        processed_at:
+          type: string
+          description: 'Time when the alarm message got processed, UTC in iso8601 format'
+          example: '2023-04-29T06:27:25Z'
+    additional_schema_for_measurement_alarm:
+      type: object
+      description: fields that only exist in measurement alarm type
+      properties:
+        alarm_delay:
+          type: string
+          description: Delay of the alarm in millisecond.
+          example: '300000'
+        alarm_value:
+          type: string
+          description: >-
+            Value of the alarm, various in range depends on its physical
+            properties.
+          example: '22.015625'
+        physical_unit:
+          type: string
+          description: Physical unit of the alarm.
+          example: °C
+        physical_value:
+          type: string
+          description: Physical value of the alarm.
+          example: Temperature
+        physical_value_extension:
+          type: string
+          description: Physical value extension of the alarm.
+          example: Air Temperature
+    measurements_schema:
+      type: object
+      description: Detailed information about the measurements.
+      properties:
+        uuid:
+          type: string
+          description: Unique identifier of the measurement.
+          example: 8b83c3c4-4a88-45c4-a9ed-87bda598fd8d
+        device_uuid:
+          type: string
+          description: Device to which the measurement belongs to.
+          example: 6b492662-002a-4b35-95d4-466264122290
+        sensor_uuid:
+          type: string
+          description: Sensor to which the measurement belongs to.
+          example: 6a081512-efbf-4de1-995f-79959989abce
+        channel_id:
+          type: number
+          description: Channel to which the measurement belongs to.
+          example: 1913253106
+        device_serial_no:
+          type: string
+          description: Device serial number to which the measurement belongs to.
+          example: '54769221'
+        sensor_serial_no:
+          type: string
+          description: Sensor serial number  to which the measurement belongs to.
+          example: '56000670'
+        tenant_uuid:
+          type: string
+          description: Tenant to which the measurement belongs to.
+          example: f9a86182-3b41-4964-1111-149f083b11d6
+        timestamp:
+          type: string
+          description: 'Time of the measurement, UTC in iso8601 format.'
+          example: '2023-04-29T06:25:00Z'
+        timestamp_local:
+          type: string
+          description: >-
+            Time of the measurement, iso8601 format in the local time of the
+            tenant.
+          example: '2023-04-29T08:25:00+02:00'
+        measurement:
+          type: number
+          description: >-
+            Value of the measurement, various in range depends on its physical
+            properties.
+          example: 21.796875
+        physical_property_name:
+          type: string
+          description: Physical property of the measurement.
+          example: Temperature
+        physical_unit:
+          type: string
+          description: Physical unit of the measurement.
+          example: °C
+        physical_extension:
+          type: string
+          description: Physical extension of measurement.
+          example: Air Temperature
+        processed_at:
+          type: string
+          description: 'Time when the measurements got processed, UTC in iso8601 format.'
+          example: '2023-04-29T06:27:25Z'
+    measurements_v2_schema:
+      type: object
+      description: Detailed information about the measurements (v2 format).
+      properties:
+        uuid:
+          type: string
+          description: Unique identifier of the measurement.
+          example: 8b83c3c4-4a88-45c4-a9ed-87bda598fd8d
+        customer_site:
+          type: string
+          description: Customer site identifier.
+          example: site-42
+        tenant_uuid:
+          type: string
+          description: Tenant to which the measurement belongs to.
+          example: f9a86182-3b41-4964-1111-149f083b11d6
+        sensor_uuid:
+          type: string
+          description: Sensor to which the measurement belongs to.
+          example: 6a081512-efbf-4de1-995f-79959989abce
+        channel_no:
+          type: number
+          description: Channel number to which the measurement belongs to.
+          example: 1
+        physical_property_name:
+          type: string
+          description: Physical property of the measurement.
+          example: Temperature
+        physical_extension:
+          type: string
+          description: Physical extension of the measurement.
+          example: Air Temperature
+        physical_unit:
+          type: string
+          description: Physical unit of the measurement.
+          example: °C
+        timestamp:
+          type: string
+          description: 'Time of the measurement, UTC in iso8601 format.'
+          example: '2023-04-29T06:25:00Z'
+        timestamp_local:
+          type: string
+          description: >-
+            Time of the measurement, iso8601 format in the local time of the tenant.
+          example: '2023-04-29T08:25:00+02:00'
+        measurement:
+          type: number
+          description: >-
+            Value of the measurement, various in range depending on its physical properties.
+          example: 21.796875
+        serial_no:
+          type: string
+          description: Serial number of the sensor.
+          example: '54769221'
+        model_code:
+          type: string
+          description: Model code of the sensor.
+          example: 0572 0001
+        processed_at:
+          type: string
+          description: 'Time when the measurement got processed, UTC in iso8601 format.'
+          example: '2023-04-29T06:27:25Z'
+    content_length:
+      type: string
+      example: '832'
+    destination:
+      type: string
+      example: /queue/username/alarms
