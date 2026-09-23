@@ -1,0 +1,19 @@
+{
+  "name": "testo-saveris-data-api-test",
+  "owner": {
+    "name": "Testo",
+    "url": "https://www.testo.com"
+  },
+  "metadata": {
+    "description": "Testo Saveris Data API integration",
+    "version": "0.0.1"
+  },
+  "plugins": [
+    {
+      "name": "testo-saveris-data-api-test",
+      "description": "Testo Saveris Data API integration",
+      "version": "0.0.1",
+      "source": "./"
+    }
+  ]
+}
