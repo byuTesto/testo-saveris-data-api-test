@@ -1,0 +1,9 @@
+{
+  "name": "testo-saveris-data-api-test",
+  "displayName": "testo-saveris-data-api-test",
+  "version": "0.0.1",
+  "description": "Testo Saveris Data API integration",
+  "author": {
+    "name": "Testo"
+  }
+}
