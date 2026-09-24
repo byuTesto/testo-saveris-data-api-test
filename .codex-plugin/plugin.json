@@ -1,0 +1,19 @@
+{
+  "name": "testo-saveris-data-api-test",
+  "version": "0.0.1",
+  "description": "Testo Saveris Data API integration for Codex.",
+  "author": {
+    "name": "Testo"
+  },
+  "homepage": "https://developers.testo.dev/saveris-logger-api/general/overview/",
+  "repository": "https://github.com/byuTesto/testo-saveris-data-api-test",
+  "license": "MIT",
+  "keywords": ["productivity", "workflow"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "testo-saveris-data-api-test",
+    "shortDescription": "Testo Saveris Data API integration",
+    "longDescription": "Testo Saveris Data API integration",
+    "category": "Productivity"
+  }
+}

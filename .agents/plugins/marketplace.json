@@ -1,0 +1,21 @@
+{
+  "name": "testo-saveris-data-api-test",
+  "interface": {
+    "displayName": "testo-saveris-data-api-test"
+  },
+  "plugins": [
+    {
+      "name": "testo-saveris-data-api-test",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/byuTesto/testo-saveris-data-api-test.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
