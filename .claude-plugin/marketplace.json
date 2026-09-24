@@ -9,7 +9,7 @@
     {
       "name": "testo-saveris-data-api-test",
       "description": "Testo Saveris Data API integration",
-      "source": "./",
+      "source": "./plugins/testo-saveris-data-api",
       "category": "productivity"
     }
   ]
