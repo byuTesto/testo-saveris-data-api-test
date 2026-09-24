@@ -7,9 +7,8 @@
     {
       "name": "testo-saveris-data-api-test",
       "source": {
-        "source": "url",
-        "url": "https://github.com/byuTesto/testo-saveris-data-api-test.git",
-        "ref": "main"
+        "source": "local",
+        "path": "./plugins/testo-saveris-data-api"
       },
       "policy": {
         "installation": "AVAILABLE",

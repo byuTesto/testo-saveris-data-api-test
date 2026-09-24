@@ -7,12 +7,12 @@
   "metadata": {
     "description": "Testo Saveris Data API integration",
     "version": "0.0.1",
-    "pluginRoot": "."
+    "pluginRoot": "plugins"
   },
   "plugins": [
     {
       "name": "testo-saveris-data-api-test",
-      "source": ".",
+      "source": "testo-saveris-data-api",
       "description": "Testo Saveris Data API integration"
     }
   ]
