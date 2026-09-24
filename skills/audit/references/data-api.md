@@ -11,8 +11,7 @@
 - Use supported endpoints only; avoid deprecated ones
 - Use the async historical flow: submit request, poll until `Completed`, then download the result
 - Keep each time window valid: 5 minutes minimum, 7 days maximum
-- Use non-overlapping incremental ranges; do not reuse or overlap previous ranges
-- Re-query only for missing, incomplete, or refreshed ranges
+- If the API is called by scheduler automatically, use non-overlapping incremental time ranges; do not reuse or overlap previous ranges
 - Retry failed calls only when the failure is not authentication-related
   - resend the POST request when retrying
   - never retry a failed GET request for the same query

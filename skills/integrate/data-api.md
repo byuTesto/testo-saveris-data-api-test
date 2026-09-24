@@ -13,13 +13,12 @@ Use this for historical retrieval only.
 - Stop and ask the user before making risky or breaking changes.
 ## Steps
 1. Before the first integration of this API, pause and ask user to confirm: "Please confirm that you have permission to use Testo Saveris Data API".
-2.  Get a token with `POST /v1/token`.
+2. Get a token with `POST /v1/token`.
 3. Send the bearer token in the `Authorization` header.
 4. Submit the historical request with the async pattern.
    - POST request like `POST /v3/alarms`, capture `request_uuid`.
    - Poll `GET /v3/alarms/{request_uuid}` until status is `Completed`.
    - Download the result from the returned pre-signed URL.
-5. Persist the result using resource/tenant/time grouping.
 ## Query rules
 - Window must be 5 minutes to 7 days.
 - Use non-overlapping incremental ranges.
