@@ -1,6 +1,6 @@
 {
   "name": "testo-saveris-data-api-test",
-  "description": "Basic Claude Code plugin scaffold for testo saveris data api",
+  "description": "Testo Saveris Data API integration",
   "version": "1.0.0",
   "author": "Testo"
 }
