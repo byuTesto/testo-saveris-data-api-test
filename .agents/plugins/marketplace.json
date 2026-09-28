@@ -8,7 +8,7 @@
       "name": "testo-saveris-data-api-test",
       "source": {
         "source": "local",
-        "path": "./plugins/testo-saveris-data-api"
+        "path": "./plugins/testo-saveris-data-api-test"
       },
       "policy": {
         "installation": "AVAILABLE",

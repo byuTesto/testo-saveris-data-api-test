@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "testo-saveris-data-api-test",
-      "source": "testo-saveris-data-api",
+      "source": "testo-saveris-data-api-test",
       "description": "Testo Saveris Data API integration"
     }
   ]
