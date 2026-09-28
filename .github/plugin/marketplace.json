@@ -13,11 +13,7 @@
       "name": "testo-saveris-data-api-test",
       "description": "Testo Saveris Data API integration",
       "version": "0.0.1",
-      "source": {
-        "source": "github",
-        "repo": "byuTesto/testo-saveris-data-api-test",
-        "path": "plugins/testo-saveris-data-api"
-      }
+      "source": "./plugins/testo-saveris-data-api"
     }
   ]
 }
