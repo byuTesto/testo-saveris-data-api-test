@@ -1,0 +1,9 @@
+{
+  "name": "testo-saveris-realtime-api-test",
+  "displayName": "testo-saveris-realtime-api-test",
+  "version": "0.0.1",
+  "description": "Testo Saveris Real-Time API integration",
+  "author": {
+    "name": "Testo"
+  }
+}

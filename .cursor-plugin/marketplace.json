@@ -1,0 +1,24 @@
+{
+  "name": "testo-saveris-data-api-test",
+  "displayName": "testo-saveris-data-api-test",
+  "owner": {
+    "name": "Testo"
+  },
+  "metadata": {
+    "description": "Testo Saveris Data API and Real-Time API integration",
+    "version": "0.0.1",
+    "pluginRoot": "plugins"
+  },
+  "plugins": [
+    {
+      "name": "testo-saveris-data-api-test",
+      "source": "testo-data-api-test",
+      "description": "Testo Saveris Data API integration"
+    },
+    {
+      "name": "testo-saveris-realtime-api-test",
+      "source": "testo-saveris-realtime-api-test",
+      "description": "Testo Saveris Real-Time API integration"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "testo-saveris-data-api-test",
-  "description": "Testo Saveris Data API integration",
+  "description": "Testo Saveris Data API and Real-Time API integration",
   "owner": {
     "name": "Testo",
     "url": "https://www.testo.com"
@@ -9,7 +9,13 @@
     {
       "name": "testo-saveris-data-api-test",
       "description": "Testo Saveris Data API integration",
-      "source": "./plugins/testo-saveris-data-api-test",
+      "source": "./plugins/testo-data-api-test",
+      "category": "productivity"
+    },
+    {
+      "name": "testo-saveris-realtime-api-test",
+      "description": "Testo Saveris Real-Time API integration",
+      "source": "./plugins/testo-saveris-realtime-api-test",
       "category": "productivity"
     }
   ]

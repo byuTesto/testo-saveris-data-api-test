@@ -5,7 +5,7 @@
     "url": "https://www.testo.com"
   },
   "metadata": {
-    "description": "Testo Saveris Data API integration",
+    "description": "Testo Saveris Data API and Real-Time API integration",
     "version": "0.0.1"
   },
   "plugins": [
@@ -13,7 +13,13 @@
       "name": "testo-saveris-data-api-test",
       "description": "Testo Saveris Data API integration",
       "version": "0.0.1",
-      "source": "./plugins/testo-saveris-data-api-test"
+      "source": "./plugins/testo-data-api-test"
+    },
+    {
+      "name": "testo-saveris-realtime-api-test",
+      "description": "Testo Saveris Real-Time API integration",
+      "version": "0.0.1",
+      "source": "./plugins/testo-saveris-realtime-api-test"
     }
   ]
 }
