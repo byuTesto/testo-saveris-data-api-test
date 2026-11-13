@@ -17,4 +17,4 @@ Documents are written to this skill's `references/` folder:
 - `openapi-YYYY-MM-DD.yaml`: version settings REST API
 
 ## Output
-Provide the API document in a human-readable format instead of raw YAML. By default, provide the entire reference content for STOMP API only. But if specific STOMP queues/channels or REST endpoints are requested, provide only related sections and references.
+Provide the API document in a human-readable format instead of raw YAML or JSON. Note to mark deprecated endpoints and queues clearly. By default, provide the entire reference content for STOMP API only. But if specific STOMP queues/channels or REST endpoints are requested, provide only related sections and references.

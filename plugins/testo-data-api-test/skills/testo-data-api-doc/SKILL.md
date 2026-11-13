@@ -12,4 +12,4 @@ Refresh the Testo Data API reference file. Use the skill-local `scripts/` entryp
 - Batch: `scripts/update-api-docs.bat`
 
 ## Output
-Provide the API document in a human-readable format instead of pure JSON. By default, provide the entire reference content, but if specific endpoints are requested, only provide related sections and references.
+Provide the API document in a human-readable format instead of pure JSON. Note to mark deprecated endpoints clearly. By default, provide the entire reference content, but if specific endpoints are requested, only provide related sections and references.
