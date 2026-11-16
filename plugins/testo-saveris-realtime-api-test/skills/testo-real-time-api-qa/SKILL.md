@@ -6,33 +6,28 @@ user-invocable: true
 
 Provide answers to frequently asked questions regarding Testo Real-Time WebSocket STOMP API integration and usage based on user context and input. If no input is provided, ask the user for more details about their issue or question.
 
-**Important**: When answering questions, also refer to the API documentation. Use `/testo-real-time-api-doc` to fetch the latest. If no concrete answer available from documentation and below sections, inform the user accordingly and suggest contacting Testo support for further assistance. Do not provide speculative answers.
+**Important**: When answering questions, also refer to the API documentation. Use `/testo-data-api-doc` to fetch the latest. Also check below sections for guidance and error tracking. Only answer based on concrete information and user-provided context. Do not speculate and map reasons if it is not explicitly mentioned in documentation and guidelines. If no concrete answer available from documentation and below sections, inform the user accordingly and suggest contacting Testo support for further assistance. Do not provide speculative answers.
 
-## Common Q&A guidelines
+## Context & guidelines
 1. Credentials & region
   - Only supported credential type is Cognito `username/password`
-    - If REST token endpoint is used, wrong or expired credentials result in a 400 Bad Request response for token request.
-    - 400 Bad Request response also occurs if using a credentials for a wrong region when using REST API to fetch token.
   - Bearer token obtained from Cognito login must be included in the `Authorization` header for all STOMP and REST API requests.
-    - Invalid authentication from Websocket/STOMP means the provided bearer token is missing, incorrect, or expired.
-    - For REST API, wrong/missing/invalid token results in a 401 Unauthorized response, while expired token results in a 403 Forbidden response.
   - The credential together with the token is region-specific and must be used with the corresponding region's base URL.
   - Credential is created by Testo with an API `username` bound with an email address; After creation an email with login information is sent to the account email.
-    - Temporary password during registration expires after 5 days; contact Testo support if it expires.
+  - Temporary password during registration expires after 5 days; contact Testo support if it expires.
   - When using AWS SDK, the Cognito client ID is region-specific and must match the region of the credential being used; Contact Testo support for Cognito client ID if necessary.
 
 2. Tenant binding & site data
   - To fetch site data, the site/tenant should be bound to the user from Testo side, check with Testo support if necessary.
     - Wrong or missing binding results missing data for the corresponding tenant from STOMP message subscription.
   - Response data should be identified based on `tenant_uuid` instead of location identifier or others.
-  - Version settings API works and binds to username directly instead of tenant binding.
+  - Version settings API works and binds to username directly instead of tenant.
 
 3. Queue & permissions
   - Permissions are on queue level
     - Invalid subscription errors often occur due to missing permissions or incorrect queue/topic names.
     - Contact Testo support for assistance with granting queue permissions.
   - When a new version of queue is released, migration is essential since old one will become unsupported or deprecated very soon.
-    - Subscriptions to a removed/non-existing queue will fail.
 
 4. Data expiration & connectivity
   - Data in the real-time API may have a limited retention period.
@@ -50,6 +45,41 @@ Provide answers to frequently asked questions regarding Testo Real-Time WebSocke
 6. Concepts
   - Physical properties - refer below [Physical properties](#physical-properties) section or latest page at `https://developers.testo.dev/saveris-logger-api/general/physical-properties/` for more details.
   - Timestamp in data with `_local` suffix indicates the local time of the measurement, otherwise it represents the UTC time.
+
+## Common API errors
+### Version settings API
+- `400 Bad Request`
+  - Missing required parameters in the request.
+  - Invalid parameter values in the request.
+- `401 Unauthorized`
+  - Missing authentication header.
+  - Wrong authentication method used (e.g., using API key instead of Bearer token).
+  - Invalid or expired token.
+  - Token used in wrong environment
+- `500 Internal Server Error`
+  - An unexpected server error occurred.
+
+### STOMP subscription
+- Invalid authentication / Invalid JWT token
+  - Missing required parameters in the request.
+  - Invalid parameter values in the request.
+  - Credential/token used in wrong environment.
+- Rate limit error
+  - `rate-limit-exceeded`: wait for 10 minutes for next connection trial.
+  - `max-connections-reached`: maximum 4 parallel connections.
+- Failed to subscribe to a queue
+  - Permission denied - the user or token does not have the necessary permissions to subscribe to the requested topic or queue.
+  - Wrong queue name format
+  - A deleted deprecated queue
+- No data received after successful subscription
+  - If multiple versions are there for the queue, check the activated version for the user.
+  - Retry to reconnect and subscribe to the queue.
+  - Missing/wrong tenant binding to the user on Testo side.
+  - Ensure logger data is uploaded to Testo cloud successfully.
+- Other subscription errors
+  - Broker unavailable - the message broker is not reachable, broker connectivity issue on Testo side.
+  - Connection refused - possibly due to network issues or broker connectivity issue on Testo side.
+  
 
 ## Physical properties
 Every measured quantity exposed by our APIs — in equipment metadata, device channels, alarms, and measurement messages — is described by three fields, always used together:
