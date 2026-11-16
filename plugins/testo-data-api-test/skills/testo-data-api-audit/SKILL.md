@@ -8,8 +8,8 @@ Do the same as `/testo-data-api-review`, but for the entire repository instead o
 If issues are found, report them as follows:
 ```markdown
 ## Testo Data API integration issues
-- **Issue summary**
-  - Why it is a problem
+- **Rule violated**
+  - Code file and line number where the issue is found
   - Recommended fix
 ```
 ## Scope

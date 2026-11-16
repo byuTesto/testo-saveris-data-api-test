@@ -9,8 +9,8 @@ Do the same as `/testo-real-time-api-review`, but for the entire repository inst
 If issues are found, report them as follows:
 ```markdown
 ## Testo Real-Time API integration issues
-- **Issue summary**
-  - Why it is a problem
+- **Rule violated**
+  - Code file and line number where the issue is found
   - Recommended fix
 ```
 ## Scope
