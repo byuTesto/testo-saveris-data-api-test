@@ -11,18 +11,27 @@ Provide answers to frequently asked questions regarding Testo Data API integrati
 ## Common Q&A guidelines
 1. Credentials & region
   - Only supported credential type is `username/password` and bearer token for Data API; API-key type is not supported
+    - Credential for Data API is from AWS Cognito instead of the Auth0 one for website UI.
+    - Wrong username/password results in a 400 Bad Request response for token request.
+    - Missing/wrong auth token or using wrong auth method like API-key results in a 401 Unauthorized response.
+    - Expired auth token results in a 403 Forbidden response.
   - Credential is created by Testo with an API `username` bound with an email address; After creation an email with login information is sent to the account email.
+    - Temporary password during registration expires after 5 days; contact Testo support if it expires.
   - The credential is region-specific and must be used with the corresponding region's base URL.
-  - Credential for Data API is from AWS Cognito instead of the Auth0 one for website UI.
-  - Temporary password during registration expires after 5 days; contact Testo support if it expires.
+    - Resulting in a 400 Bad Request response if the region does not match the credential for token request.
+    - 401 Unauthorized response if a valid token is used with a mismatched region for subsequent API requests.
 
 2. Tenant binding & site data
   - To fetch site data, the site/tenant should be bound to the user from Testo side, check with Testo support if necessary.
+    - Wrong or missing binding results in a success response with an HTTP 200 status and an empty data set for corresponding tenant.
   - Response data should be identified based on `tenant_uuid` instead of location identifier or others.
 
 3. Endpoints & versioning
   - Timeout or too large request payloads are known issues with sync endpoints.
+    - Timeout may result in a 504 Gateway Timeout.
+    - Too large request payloads result in a 413 Payload Too Large response.
   - Sync endpoints are deprecated and will be removed in future versions of the API; migrate to use corresponding non-deprecated async endpoints instead.
+    - Using a non-existing endpoint results in a 403 Forbidden response.
   - Always check the endpoint documentation for the latest updates and deprecation notices; new version is always recommended to use.
 
 4. Detailed data issue - check with Testo support
