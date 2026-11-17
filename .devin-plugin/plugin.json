@@ -1,0 +1,24 @@
+{
+  "name": "testo-saveris-marketplace-test",
+  "version": "0.0.4",
+  "description": "Testo Saveris Data API and Real-Time API integration",
+  "author": {
+    "name": "Testo"
+  },
+  "homepage": "https://www.testo.com",
+  "repository": "https://github.com/byuTesto/test-agent-plugin",
+  "license": "MIT",
+  "keywords": ["testo", "saveris"],
+  "requiredPlugins": [
+    {
+      "source": "git-subdir",
+      "url": "https://github.com/byuTesto/test-agent-plugin.git",
+      "path": "plugins/testo-data-api-test"
+    },
+    {
+      "source": "git-subdir",
+      "url": "https://github.com/byuTesto/test-agent-plugin.git",
+      "path": "plugins/testo-saveris-realtime-api-test"
+    }
+  ]
+}

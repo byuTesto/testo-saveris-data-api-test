@@ -1,0 +1,13 @@
+{
+  "name": "testo-saveris-realtime-api-test",
+  "version": "0.0.4",
+  "description": "Testo Saveris Real-Time API integration",
+  "author": {
+    "name": "Testo",
+    "url": "https://www.testo.com"
+  },
+  "homepage": "https://developers.testo.dev/saveris-logger-api/push-api/",
+  "repository": "https://github.com/byuTesto/test-agent-plugin",
+  "license": "MIT",
+  "keywords": ["testo", "saveris", "testo real-time api"]
+}
